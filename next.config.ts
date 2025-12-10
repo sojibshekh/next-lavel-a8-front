@@ -2,8 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['i.ibb.co', 'i.ibb.co.com'], // এখানে তোমার image host যোগ করো
-  },
+  remotePatterns: [
+    {
+      protocol: "https",
+      hostname: "example.com",
+    },
+  ],
+}
+
 };
 
 export default nextConfig;
