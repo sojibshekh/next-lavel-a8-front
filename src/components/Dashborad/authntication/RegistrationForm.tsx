@@ -8,18 +8,16 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 
 
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { toast } from "sonner"
-import { Select } from "@radix-ui/react-select"
-import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
 
 const registerSchema = z.object({
   name: z.string().min(3, { message: "Name is too short" }).max(50),
   email: z.string().email({ message: "Invalid email" }),
-  userRole: z.string().min(1, { message: "Select Role is required" }),
+  
   password: z.string()
     .min(8, { message: "Password must be at least 8 characters" })
     .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
@@ -43,20 +41,20 @@ export default function RegistrationForm() {
       email: "",
       password: "",
       confirmPassword: "",
-      userRole: ""
+   
     }
   })
 
   const onSubmit = async (values: RegisterFormValues) => {
+    console.log("Registering user with values:", values)
     try {
-      const res = await fetch("/api/v1/auth/register", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: values.name,
           email: values.email,
           password: values.password,
-          role: values.userRole
         })
       })
 
@@ -143,31 +141,9 @@ export default function RegistrationForm() {
               )}
             />
 
-            {/* Role Select */}
-            <FormField
-              control={form.control}
-              name="userRole"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Role</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Role" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="user">User</SelectItem>
-                      <SelectItem value="agent">Agent</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <Button type="submit" className="w-full">
-              Register
+              Registation
             </Button>
           </form>
         </Form>

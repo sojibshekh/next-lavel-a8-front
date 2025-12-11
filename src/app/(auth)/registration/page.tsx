@@ -1,4 +1,4 @@
-
+import RegistrationForm from "@/components/Dashborad/authntication/RegistrationForm";
 
 
 
@@ -11,12 +11,12 @@ export default function RegistraionPage() {
             <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
              {/* <Logo></Logo> */}
             </div>
-            Digital Wallte.
+           Tour Mate.
           </a>
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-      \
+           <RegistrationForm></RegistrationForm>
           </div>
         </div>
         
@@ -24,7 +24,11 @@ export default function RegistraionPage() {
       
 
         <div className="bg-muted relative hidden lg:block">
-
+        <img
+          src="/src/assets/image/image2.jpg"
+          alt="Image"
+          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+        />
       </div>
       
     </div>

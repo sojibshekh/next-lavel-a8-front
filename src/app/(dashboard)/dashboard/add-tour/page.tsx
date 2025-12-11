@@ -1,4 +1,4 @@
-export default function DashboardPage() {
+export default function AddTourPage() {
  
   return (
       <div className="min-h-screen bg-background">

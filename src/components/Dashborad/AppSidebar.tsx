@@ -30,8 +30,8 @@ const data = {
                     url: "/dashboard",
                 },
                 {
-                    title: "Add Blog",
-                    url: "/dashboard/add-blog",
+                    title: "Add Tour",
+                    url: "/dashboard/add-tour",
                 },
                 {
                     title: "Add Project",
@@ -47,7 +47,7 @@ export async function getCurrentUserServer() {
         const cookieStore = await cookies()
         const token = cookieStore.get('accessToken')?.value
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/me`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
             headers: {
                 Authorization: `${token}`
             },
