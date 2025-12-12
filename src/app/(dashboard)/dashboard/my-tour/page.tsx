@@ -1,11 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface UserRequest {
   id: string;
@@ -29,7 +40,6 @@ export default function TravelDashboard() {
   const [myTravels, setMyTravels] = useState<TravelPlan[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Load travels from API
   const loadMyTravels = async () => {
     setLoading(true);
     try {
@@ -47,9 +57,7 @@ export default function TravelDashboard() {
     }
   };
 
-  // Delete Travel Plan
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this travel plan?")) return;
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/travel-plans/delete/${id}`, {
         method: "DELETE",
@@ -68,12 +76,10 @@ export default function TravelDashboard() {
     }
   };
 
-  // Update Travel (redirect or modal)
   const handleUpdate = (id: string) => {
-    window.location.href = `/update-travel/${id}`;
+    window.location.href = `/dashboard/my-tour/${id}`;
   };
 
-  // Approve User Request
   const handleApproveRequest = async (travelId: string, userId: string) => {
     try {
       const res = await fetch(
@@ -99,74 +105,107 @@ export default function TravelDashboard() {
 
   if (loading)
     return (
-      <div className="max-w-4xl mx-auto mt-10 space-y-4">
+      <div className="max-w-6xl mx-auto mt-10 space-y-4">
         <Skeleton className="h-10 w-40" />
-        <Skeleton className="h-24 w-full" />
-        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
       </div>
     );
 
   return (
-    <div className="max-w-4xl mx-auto py-10 space-y-6">
+    <div className="max-w-6xl mx-auto py-10">
       <h1 className="text-3xl font-bold mb-6">My Travel Plans</h1>
 
-      {myTravels.length === 0 && (
+      {myTravels.length === 0 ? (
         <p className="text-muted-foreground">You have no travel plans yet.</p>
+      ) : (
+        <table className="w-full border-collapse border border-gray-200">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border px-4 py-2 text-left">Destination</th>
+              <th className="border px-4 py-2 text-left">Dates</th>
+              <th className="border px-4 py-2 text-left">Actions</th>
+              <th className="border px-4 py-2 text-left">Requests</th>
+            </tr>
+          </thead>
+          <tbody>
+            {myTravels.map((plan) => (
+              <tr key={plan.id} className="hover:bg-gray-50">
+                <td className="border px-4 py-2">{plan.destination}</td>
+                <td className="border px-4 py-2">
+                  {formatDate(plan.startDate)} → {formatDate(plan.endDate)}
+                </td>
+                <td className="border px-4 py-2 space-x-2">
+                  <Button size="sm" variant="outline" onClick={() => handleUpdate(plan.id)}>
+                    Update
+                  </Button>
+
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button size="sm" variant="destructive">
+                        Delete
+                      </Button>
+                    </AlertDialogTrigger>
+
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete the travel plan.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDelete(plan.id)}>
+                          Confirm Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </td>
+                <td className="border px-4 py-2">
+                  {(!plan.requests || plan.requests.length === 0) ? (
+                    <p className="text-muted-foreground">No requests</p>
+                  ) : (
+                    <table className="w-full border-collapse border border-gray-200">
+                      <thead>
+                        <tr className="bg-gray-50">
+                          <th className="border px-2 py-1 text-left">User</th>
+                          <th className="border px-2 py-1 text-left">Email</th>
+                          <th className="border px-2 py-1 text-left">Status</th>
+                          <th className="border px-2 py-1 text-left">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {plan.requests.map((req) => (
+                          <tr key={req.id}>
+                            <td className="border px-2 py-1">{req.fromUser.name}</td>
+                            <td className="border px-2 py-1">{req.fromUser.email}</td>
+                            <td className="border px-2 py-1">
+                              <Badge variant={getBadgeVariant(req.status)}>{req.status}</Badge>
+                            </td>
+                            <td className="border px-2 py-1">
+                              {req.status === "PENDING" && (
+                                <Button
+                                  size="sm"
+                                  variant="default"
+                                  onClick={() => handleApproveRequest(plan.id, req.fromUser.id)}
+                                >
+                                  Approve
+                                </Button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
-
-      {myTravels.map((plan) => (
-        <Card key={plan.id}>
-          <CardHeader className="flex justify-between items-center">
-            <CardTitle>{plan.destination}</CardTitle>
-            <div className="space-x-2">
-              <Button size="sm" variant="outline" onClick={() => handleUpdate(plan.id)}>
-                Update
-              </Button>
-              <Button size="sm" variant="destructive" onClick={() => handleDelete(plan.id)}>
-                Delete
-              </Button>
-            </div>
-          </CardHeader>
-
-          <CardContent className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              {formatDate(plan.startDate)} → {formatDate(plan.endDate)}
-            </p>
-
-            {(!plan.requests || plan.requests.length === 0) && (
-              <p className="text-muted-foreground">No users have shown interest yet.</p>
-            )}
-
-            {plan.requests && plan.requests.length > 0 && (
-              <div className="space-y-2">
-                {plan.requests.map((req) => (
-                  <div
-                    key={req.id}
-                    className="border p-3 rounded-md flex justify-between items-center"
-                  >
-                    <div>
-                      <p className="font-medium">{req.fromUser.name}</p>
-                      <p className="text-sm text-muted-foreground">{req.fromUser.email}</p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Badge>{req.status}</Badge>
-                      {req.status === "PENDING" && (
-                        <Button
-                          size="sm"
-                          variant="default"
-                          onClick={() => handleApproveRequest(plan.id, req.fromUser.id)}
-                        >
-                          Approve
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      ))}
     </div>
   );
 }
@@ -177,3 +216,16 @@ const formatDate = (d: string) =>
     day: "numeric",
     year: "numeric",
   });
+
+const getBadgeVariant = (status: string) => {
+  switch (status) {
+    case "PENDING":
+      return "secondary";
+    case "APPROVED":
+      return "default";
+    case "REJECTED":
+      return "destructive";
+    default:
+      return "secondary";
+  }
+};

@@ -1,34 +1,102 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useEffect, useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
-export default function MyMatchRequestsPage() {
-  const [data, setData] = useState<any>(null);
+interface MatchRequest {
+  id: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  travelPlan: {
+    destination: string;
+    startDate: string;
+    endDate: string;
+  };
+  fromUser?: {
+    name: string;
+    email: string;
+  };
+  toUser?: {
+    name: string;
+    email: string;
+  };
+}
+
+interface MyMatchesData {
+  sentRequests: MatchRequest[];
+  receivedRequests: MatchRequest[];
+}
+
+export default function MyMatchesPage() {
+  const [sentMatches, setSentMatches] = useState<MatchRequest[]>([]);
+  const [receivedMatches, setReceivedMatches] = useState<MatchRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const loadRequests = async () => {
+  const loadMatches = async () => {
+    setLoading(true);
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/matches/my`, {
-      
+        credentials: "include",
       });
-
-      const json = await res.json();
-      setData(json.data);
+      const data = await res.json();
+      if (data.success && data.data) {
+        setSentMatches(data.data.sentRequests || []);
+        setReceivedMatches(data.data.receivedRequests || []);
+      } else {
+        setSentMatches([]);
+        setReceivedMatches([]);
+        toast.error("Failed to load matches");
+      }
     } catch (err) {
-      console.error("Failed to load", err);
+      console.error(err);
+      toast.error("Failed to load matches");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadRequests();
+    loadMatches();
   }, []);
+
+  const getBadgeVariant = (status: string) => {
+    switch (status) {
+      case "PENDING":
+        return "secondary";
+      case "APPROVED":
+        return "default";
+      case "REJECTED":
+        return "destructive";
+      default:
+        return "secondary";
+    }
+  };
+
+  const renderMatchCard = (match: MatchRequest, isSent: boolean) => (
+    <Card key={match.id}>
+      <CardHeader className="flex justify-between items-center">
+        <CardTitle>{match.travelPlan.destination}</CardTitle>
+        <Badge variant={getBadgeVariant(match.status)}>{match.status}</Badge>
+      </CardHeader>
+
+      <CardContent className="space-y-2">
+        <p>
+          {isSent ? "To: " : "From: "}
+          <span className="font-medium">
+            {isSent ? match.toUser?.name : match.fromUser?.name}
+          </span>{" "}
+          ({isSent ? match.toUser?.email : match.fromUser?.email})
+        </p>
+        <p>
+          Travel Dates:{" "}
+          {new Date(match.travelPlan.startDate).toLocaleDateString()} -{" "}
+          {new Date(match.travelPlan.endDate).toLocaleDateString()}
+        </p>
+      </CardContent>
+    </Card>
+  );
 
   if (loading)
     return (
@@ -39,129 +107,19 @@ export default function MyMatchRequestsPage() {
       </div>
     );
 
-  if (!data)
-    return (
-      <p className="text-center text-red-500 mt-10">
-        Failed to load match requests.
-      </p>
-    );
-
   return (
-    <div className="max-w-5xl mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6">My Match Requests</h1>
+    <div className="max-w-4xl mx-auto py-10 space-y-6">
+      <h1 className="text-3xl font-bold mb-6">My Matches</h1>
 
-      <Tabs defaultValue="sent" className="w-full">
-        <TabsList className="mb-6">
-          <TabsTrigger value="sent">Sent Requests</TabsTrigger>
-          <TabsTrigger value="received">Received Requests</TabsTrigger>
-        </TabsList>
+      {/* Sent Requests */}
+      <h2 className="text-xl font-semibold mb-2">Sent Requests</h2>
+      {sentMatches.length === 0 && <p className="text-muted-foreground">No sent requests.</p>}
+      {sentMatches.map((match) => renderMatchCard(match, true))}
 
-        {/* SENT REQUESTS */}
-        <TabsContent value="sent">
-          <RequestTable
-            title="Sent Requests"
-            emptyText="You haven't sent any match requests yet."
-            items={data.sentRequests}
-          />
-        </TabsContent>
-
-        {/* RECEIVED REQUESTS */}
-        <TabsContent value="received">
-          <RequestTable
-            title="Received Requests"
-            emptyText="No one has sent you match requests yet."
-            items={data.receivedRequests}
-          />
-        </TabsContent>
-      </Tabs>
+      {/* Received Requests */}
+      <h2 className="text-xl font-semibold mb-2 mt-6">Received Requests</h2>
+      {receivedMatches.length === 0 && <p className="text-muted-foreground">No received requests.</p>}
+      {receivedMatches.map((match) => renderMatchCard(match, false))}
     </div>
   );
 }
-
-function RequestTable({
-  title,
-  emptyText,
-  items,
-}: {
-  title: string;
-  emptyText: string;
-  items: any[];
-}) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-      </CardHeader>
-
-      <CardContent>
-        {items.length === 0 ? (
-          <p className="text-center py-10 text-muted-foreground">{emptyText}</p>
-        ) : (
-          <div className="space-y-4">
-            {items.map((req) => (
-              <div
-                key={req.id}
-                className="p-4 border rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-4"
-              >
-                <div>
-                  <p className="font-semibold text-lg">{req.travelPlan.destination}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {formatDate(req.travelPlan.startDate)} →{" "}
-                    {formatDate(req.travelPlan.endDate)}
-                  </p>
-
-                  {/* USER INFO */}
-                  <p className="text-sm mt-1">
-                    {title.includes("Sent") ? (
-                      <>
-                        To:{" "}
-                        <span className="font-medium">{req.toUser?.name}</span> (
-                        {req.toUser?.email})
-                      </>
-                    ) : (
-                      <>
-                        From:{" "}
-                        <span className="font-medium">{req.fromUser?.name}</span> (
-                        {req.fromUser?.email})
-                      </>
-                    )}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <Badge
-                    className={
-                      req.status === "PENDING"
-                        ? "bg-yellow-500"
-                        : req.status === "ACCEPTED"
-                        ? "bg-green-600"
-                        : "bg-red-600"
-                    }
-                  >
-                    {req.status}
-                  </Badge>
-
-                  <Button
-                    variant="outline"
-                    onClick={() =>
-                      (window.location.href = `/all-travel/${req.travelPlanId}`)
-                    }
-                  >
-                    View Plan
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-const formatDate = (d: string) =>
-  new Date(d).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });

@@ -34,9 +34,15 @@ const data = {
                     url: "/dashboard/add-tour",
                 },
                 {
-                    title: "Add Project",
-                    url: "/dashboard/add-project",
+                    title: "My Travel plans",
+                    url: "/dashboard/my-tour",
                 },
+                 {
+                    title: "My Travel Interests",
+                    url: "/dashboard/my-interests",
+                },
+                
+
             ],
         }
     ],
