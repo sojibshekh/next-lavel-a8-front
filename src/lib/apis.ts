@@ -10,14 +10,14 @@ import { LoginCredentials } from "@/types/response";
 // ==================== AUTH APIs ====================
 
 // Login
-export async function login(credentials: LoginCredentials) {
-    try {
-        const res = await axiosInterceptor.post("/auth/login", credentials);
-        return res.data;
-    } catch (error: any) {
-        throw error;
-    }
-}
+// export async function login(credentials: LoginCredentials) {
+//     try {
+//         const res = await axiosInterceptor.post("/auth/login", credentials);
+//         return res.data;
+//     } catch (error: any) {
+//         throw error;
+//     }
+// }
 
 // Logout
 export async function logout(): Promise<void> {

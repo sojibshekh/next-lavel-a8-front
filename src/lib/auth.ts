@@ -7,10 +7,9 @@ export async function requireAuth() {
 
     const cookieStore = await cookies()
 
-    console.log('Cookies:', cookieStore.getAll())
+
     const token = cookieStore.get('accessToken')?.value
 
-    console.log('Access Token:', token)
 
     if (!token) {
         redirect('/login')

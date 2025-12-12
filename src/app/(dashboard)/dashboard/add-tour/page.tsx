@@ -37,7 +37,7 @@ export default function AddTravelPlanPage() {
         setError("")
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/travel-plans`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/travel-plans/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

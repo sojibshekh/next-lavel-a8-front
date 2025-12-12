@@ -8,8 +8,6 @@ if (!baseURL) {
 
 
 
-
-
 const axiosInterceptor = axios.create({
     baseURL,
     withCredentials: true,
@@ -101,14 +99,5 @@ axiosInterceptor.interceptors.response.use(
 
 // ==================== HEALTH CHECK ====================
 
-export async function checkBackendHealth() {
-    try {
-        const res = await axiosInterceptor.get('/health', { timeout: 3000 })
-        return res.status === 200
-    } catch (error) {
-        console.log(error)
-        return false
-    }
-}
 
 export default axiosInterceptor;

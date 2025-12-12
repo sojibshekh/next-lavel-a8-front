@@ -14,7 +14,7 @@ const SingleTravelPlanClient = () => {
   useEffect(() => {
     const fetchPlan = async () => {
       try {
-        const res = await fetch(`https://assignment8-api-server.vercel.app/api/v1/travel-plans/${params.id}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/travel-plans/${params.id}`);
         const data = await res.json();
         setPlan(data.data);
       } catch (err) {

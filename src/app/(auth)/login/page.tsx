@@ -51,7 +51,7 @@ export default function LoginPage() {
 
             // Call server action
             const result = await handleLogin(formData.email, formData.password)
-
+             
             if (result.success) {
                 // Store user info in localStorage (optional)
                 if (result.user) {

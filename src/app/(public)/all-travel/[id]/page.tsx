@@ -9,7 +9,7 @@ import SingleTravelPlanClient from "@/components/travel/SingleTravelPlanClient";
 
 async function fetchTravelPlanById(id: string) {
     try {
-       const res = await fetch(`https://assignment8-api-server.vercel.app/api/v1/travel-plans/${id}`);
+       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/travel-plans/${id}`);
         const data = await res.json();
         return data?.data || null;
     } catch (error) {
