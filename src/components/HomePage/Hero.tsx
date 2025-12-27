@@ -1,69 +1,120 @@
-"use client"
-import { ArrowRight, Sparkles, Github, Linkedin, Facebook } from "lucide-react"
-import { useEffect, useState } from "react"
-import { Badge } from "../ui/badge"
-import Link from "next/link"
-import { Button } from "../ui/button"
+'use client';
+
+import { useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { gsap } from 'gsap';
+import { ArrowRight, Play, MapPin, Star } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 
 const Hero = () => {
-    const [isVisible, setIsVisible] = useState(false)
+    const heroRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        setIsVisible(true)
-    }, [])
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from('.hero-text', {
+        y: 100,
+        opacity: 0,
+        duration: 1,
+        stagger: 0.2,
+        ease: 'power4.out',
+      });
+      gsap.from('.hero-image', {
+        scale: 0.8,
+        opacity: 0,
+        duration: 1.2,
+        delay: 0.5,
+        ease: 'power4.out',
+      });
+    }, heroRef);
+
+    return () => ctx.revert();
+  }, []);
 
     return (
-        <section className="relative flex min-h-screen w-full overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
-            {/* Animated Background Elements */}
-            <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
-                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      <section ref={heroRef} className="relative min-h-[90vh] flex items-center overflow-hidden">
+      <div className="absolute inset-0 gradient-primary opacity-5" />
+      <div className="absolute top-20 right-0 w-96 h-96 bg-primary/20 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/20 rounded-full blur-3xl" />
+      
+      <div className="container mx-auto px-4 py-20">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="space-y-8">
+            <Badge className="hero-text gradient-primary text-primary-foreground px-4 py-2">
+              🌍 Join 50,000+ Travelers Worldwide
+            </Badge>
+            <h1 className="hero-text font-display text-5xl lg:text-7xl font-bold leading-tight">
+              Find Your Perfect
+              <span className="gradient-text block">Travel Buddy</span>
+            </h1>
+            <p className="hero-text text-xl text-muted-foreground max-w-lg">
+              Connect with like-minded travelers, plan adventures together, 
+              and explore the world with your new best friend.
+            </p>
+            <div className="hero-text flex flex-wrap gap-4">
+              <Button size="lg" className="gradient-primary text-primary-foreground shadow-glow text-lg px-8" asChild>
+                <Link href="/register">Start Your Journey <ArrowRight className="ml-2 w-5 h-5" /></Link>
+              </Button>
+              <Button size="lg" variant="outline" className="text-lg px-8">
+                <Play className="mr-2 w-5 h-5" /> Watch Demo
+              </Button>
             </div>
-
-            <div className={`relative z-10 m-auto flex container flex-col items-center justify-center gap-8 px-6 text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-                {/* Badge */}
-                <Badge variant="secondary" className="px-4 py-2 text-sm font-medium animate-bounce">
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Find  Your Perfect Travel Companion
-                </Badge>
-
-                {/* Main Heading */}
-                <h1 className="text-5xl md:text-7xl font-bold leading-tight bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">
-                  Travel Buddy & Meetup
-                </h1>
-
-                {/* Subheading */}
-                <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl">
-                  Travel Buddy & Meetup Platform aims to create   <span className="text-primary font-semibold">meaningful connections</span> among travelers by helping them find compatible companions for upcoming trips.
-                </p>
-
-                {/* Tech Stack Pills */}
-                <div className="flex flex-wrap justify-center gap-2 max-w-xl">
-                    {["Travel", "Injoy", "Place", "Meet"].map((tech) => (
-                        <span key={tech} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
-                            {tech}
-                        </span>
-                    ))}
-                </div>
-
-                {/* CTA Buttons */}
-                <div className="flex flex-wrap gap-4 mt-4">
-                    <Link href="/contact">
-                        <Button size="lg" className="cursor-pointer rounded-full px-8 shadow-lg hover:shadow-xl transition-shadow">
-                            Join Now
-                            <ArrowRight className="ml-2 w-4 h-4" />
-                        </Button>
-                    </Link>
-                    <Link href="/projects">
-                        <Button size="lg" variant="outline" className="cursor-pointer rounded-full px-8">
-                           Meet Tour Buddy
-                        </Button>
-                    </Link>
-                </div>
-
+            <div className="hero-text flex items-center gap-4">
+              <div className="flex -space-x-3">
+                {[1, 2, 3, 4].map((i) => (
+                  <Avatar key={i} className="w-10 h-10 border-2 border-background">
+                    <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                      {String.fromCharCode(64 + i)}
+                    </AvatarFallback>
+                  </Avatar>
+                ))}
+              </div>
+              <div className="text-sm">
+                <span className="font-semibold">1,200+</span> travelers joined this week
+              </div>
             </div>
-        </section>
+          </div>
+          <div className="hero-image relative hidden lg:block">
+            <div className="relative w-full aspect-square">
+              <img
+                src="https://images.unsplash.com/photo-1539635278303-d4002c07eae3?w=600"
+                alt="Travelers exploring"
+                className="rounded-3xl shadow-elegant object-cover w-full h-full"
+              />
+              <motion.div
+                animate={{ y: [0, -10, 0] }}
+                transition={{ repeat: Infinity, duration: 3 }}
+                className="absolute -bottom-6 -left-6 bg-card p-4 rounded-2xl shadow-card"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full gradient-primary flex items-center justify-center">
+                    <MapPin className="w-6 h-6 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <p className="font-semibold">Next Trip: Bali</p>
+                    <p className="text-sm text-muted-foreground">3 buddies joined</p>
+                  </div>
+                </div>
+              </motion.div>
+              <motion.div
+                animate={{ y: [0, 10, 0] }}
+                transition={{ repeat: Infinity, duration: 4 }}
+                className="absolute -top-4 -right-4 bg-card p-4 rounded-2xl shadow-card"
+              >
+                <div className="flex items-center gap-2">
+                  <Star className="w-5 h-5 text-warning fill-warning" />
+                  <span className="font-bold">4.9</span>
+                  <span className="text-muted-foreground text-sm">rating</span>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
     )
 }
 
