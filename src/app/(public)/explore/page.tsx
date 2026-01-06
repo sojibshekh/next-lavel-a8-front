@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { Metadata } from "next";
 import TravelPlansPageClient from "@/components/travel/TravelPlansPageClient";
+import { getCurrentUserServer } from "@/components/Dashborad/AppSidebar";
 
 
 export const metadata: Metadata = {
@@ -32,11 +33,17 @@ export const metadata: Metadata = {
     },
 }
 
-export default function page() {
+ 
+
+
+export default async function page() {
+
+     const userInfo = await getCurrentUserServer();
+    const user = userInfo?.data;
     return (
         <div className="min-h-screen bg-background">
             {/* Travel Plans List */}
-            <TravelPlansPageClient />
+            <TravelPlansPageClient currentUserId={user?.id} />
 
             {/* CTA Section */}
             <section className="py-16 max-w-6xl mx-auto px-6">

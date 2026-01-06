@@ -1,11 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import { Sparkles, Calendar, User, ArrowLeft } from "lucide-react";
-
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { Sparkles, } from "lucide-react";
 import SingleTravelPlanClient from "@/components/travel/SingleTravelPlanClient";
+import { getCurrentUserServer } from "@/components/Dashborad/AppSidebar";
 
 async function fetchTravelPlanById(id: string) {
     try {
@@ -23,10 +21,13 @@ async function fetchTravelPlanById(id: string) {
 
 export default async function page() {
 
+
+      const userInfo = await getCurrentUserServer();
+        const user = userInfo?.data;
     return (
         <div className="min-h-screen bg-background">
             {/* Travel Plan Details */}
-          <SingleTravelPlanClient />
+          <SingleTravelPlanClient currentUserId={user?.id} />
 
             {/* CTA Section */}
             <section className="pt-16 pb-10 max-w-6xl mx-auto px-6">

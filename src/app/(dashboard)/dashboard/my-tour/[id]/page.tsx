@@ -24,6 +24,8 @@ export default function UpdateTravelPlanPage() {
     endDate: "",
     travelType: "",
     description: "",
+    image: "",
+    budget: "",
   });
 
   // Load travel plan data
@@ -44,6 +46,8 @@ export default function UpdateTravelPlanPage() {
             endDate: plan.endDate ? plan.endDate.split("T")[0] : "",
             travelType: plan.travelType || "",
             description: plan.description || "",
+            image: plan.photoUrl || "",
+            budget: plan.budget || "",
           });
         } else {
           setError("Travel plan not found.");
@@ -95,6 +99,8 @@ export default function UpdateTravelPlanPage() {
         endDate: formData.endDate ? new Date(formData.endDate) : null,
         travelType: formData.travelType,
         description: formData.description,
+        photoUrl: formData.image,
+        budget: Number(formData.budget),
       };
 
       const res = await fetch(
@@ -212,6 +218,31 @@ export default function UpdateTravelPlanPage() {
                   <option value="GROUP">GROUP</option>
                 </select>
               </div>
+
+
+                {/* Budget */}
+                <div className="space-y-2">
+                    <Label>Budget (BDT) *</Label>
+                    <Input
+                        type="number"
+                        name="budget"
+                        placeholder="Enter budget"
+                        value={formData.budget}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Image Url *</Label>
+                    <Input
+                        type="url"
+                        name="image"
+                        placeholder="Enter Image URL"
+                        value={formData.image}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
 
               {/* Description */}
               <div className="space-y-2">

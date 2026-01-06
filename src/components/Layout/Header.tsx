@@ -7,16 +7,26 @@ import Image from 'next/image';
 
 
 import logoMain from '../../../public/vercel.svg';
+import { getCurrentUserServer } from '../Dashborad/AppSidebar';
 
 
 const navigationLinks = [
     { href: "/", label: "Home" },
+    { href: "/about", label: "About" },
+    { href: "/destinations", label: "Destinations" },
+    { href: "/explore", label: "Explore Traveler" },
+    { href: "/pricing", label: "Pricing" },
+
  
     { href: "/contact", label: "Contact" },
 ];
 
 
-const Header = () => {
+const Header = async () => {
+
+     const userInfo = await getCurrentUserServer();
+    const user = userInfo?.data ;
+    
     return (
         <div>
           <header className="px-4 md:px-6 bg-gray-900">
@@ -77,6 +87,15 @@ const Header = () => {
                                 ))}
                             </NavigationMenuList>
                         </NavigationMenu>
+
+                        {!user? <div> 
+                            <Link className="" href="/login"> <Button >Login</Button> </Link>
+                            <Link className="" href="/registration"> <Button >Registration</Button> </Link>
+                        </div> : <div>
+                        <span className="text-white mr-4">Hello, <Link className="" href="/"> <Button > {user?.name}</Button> </Link> </span>
+                             </div>  }
+                       
+                          
                     </div>
                 </div>
             </div>

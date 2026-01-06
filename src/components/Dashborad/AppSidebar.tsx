@@ -71,7 +71,7 @@ export async function getCurrentUserServer() {
 export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     //  const userInfo = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/me`)
     const userInfo = await getCurrentUserServer();
-    const user = userInfo.data;
+    const user = userInfo?.data;
 
     return (
         <Sidebar {...props}>

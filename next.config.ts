@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
       hostname: "example.com",
     },
   ],
+  domains: ["images.unsplash.com"],
 }
 
 };

@@ -11,8 +11,7 @@ const Footer = () => {
       </h2>
 
       <p className="mx-auto mt-4 max-w-sm text-gray-500 dark:text-gray-400">
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Cum maiores ipsum eos temporibus
-        ea nihil.
+       TravelBuddy was founded with a simple belief: travel is better together. We connect like-minded adventurers from around the world, helping them find the perfect travel companion for their next journey.
       </p>
 
     

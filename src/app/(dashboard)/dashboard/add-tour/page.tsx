@@ -22,6 +22,7 @@ export default function AddTravelPlanPage() {
         budget: "",
         travelType: "",
         description: "",
+        image: "",
     })
 
     // Change handler for inputs/select/textarea
@@ -47,6 +48,7 @@ export default function AddTravelPlanPage() {
                     startDate: new Date(formData.startDate),
                     endDate: new Date(formData.endDate),
                     budget: Number(formData.budget),
+                    photoUrl: formData.image,
                     travelType: formData.travelType,
                     description: formData.description,
                 }),
@@ -149,6 +151,17 @@ export default function AddTravelPlanPage() {
                                     name="budget"
                                     placeholder="Enter budget"
                                     value={formData.budget}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Image Url *</Label>
+                                <Input
+                                    type="url"
+                                    name="image"
+                                    placeholder="Enter Image URL"
+                                    value={formData.image}
                                     onChange={handleChange}
                                     required
                                 />

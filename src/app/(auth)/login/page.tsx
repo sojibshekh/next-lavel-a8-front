@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react"
 import { handleLogin } from "./actions"
+import Link from "next/link"
 
 export default function LoginPage() {
     const router = useRouter()
@@ -183,7 +184,16 @@ export default function LoginPage() {
                             )}
                         </Button>
                     </form>
+
                 </CardContent>
+
+                <p className="text-center text-sm">
+                If you are a new user please go to{" "}
+                <Link href="/registration" className="underline text-primary">
+                    Registration
+                </Link>
+                </p>
+
             </Card>
         </div>
     )

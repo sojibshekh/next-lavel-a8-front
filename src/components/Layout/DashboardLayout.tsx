@@ -27,7 +27,7 @@ import {
   Star,
   Users
 } from 'lucide-react';
-import { signOut, useSession } from 'next-auth/react';
+
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -70,17 +70,17 @@ const adminNavItems = [
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { data: session } = useSession();
+
   const router = useRouter();
   const pathname = usePathname();
 
-  const user = session?.user;
-  const isAdmin = user?.role === 'admin';
 
-  const navItems = isAdmin ? adminNavItems : userNavItems;
 
   const handleSignOut = async () => {
-    await signOut({ redirect: false });
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/signout`, {
+      method: 'POST',
+      credentials: 'include',
+    });
     router.push('/');
     router.refresh();
   };
@@ -106,7 +106,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       </div>
 
       {/* User Info */}
-      <div className="p-4 border-b border-sidebar-border">
+      {/* <div className="p-4 border-b border-sidebar-border">
         <div className={cn("flex items-center gap-3", !sidebarOpen && "justify-center")}>
           <Avatar className="h-10 w-10 border-2 border-primary/20">
             <AvatarImage src="" />
@@ -125,11 +125,11 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             </motion.div>
           )}
         </div>
-      </div>
+      </div> */}
 
       {/* Navigation */}
       <ScrollArea className="flex-1 py-4">
-        <nav className="px-2 space-y-1">
+        {/* <nav className="px-2 space-y-1">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -157,7 +157,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               </Link>
             );
           })}
-        </nav>
+        </nav> */}
       </ScrollArea>
 
       {/* Bottom Actions */}
@@ -237,7 +237,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 <Menu className="w-5 h-5" />
               </Button>
               <h1 className="font-display text-xl font-bold">
-                {isAdmin ? 'Admin Dashboard' : 'Overview'}
+                {/* {isAdmin ? 'Admin Dashboard' : 'Overview'} */}
               </h1>
             </div>
 
@@ -249,7 +249,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               <Avatar className="h-9 w-9 border-2 border-primary/20">
                 <AvatarImage src="" />
                 <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
-                  {user?.email?.charAt(0).toUpperCase()}
+                  {/* {user?.email?.charAt(0).toUpperCase()} */}
                 </AvatarFallback>
               </Avatar>
             </div>
