@@ -14,7 +14,8 @@ const navigationLinks = [
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
     { href: "/destinations", label: "Destinations" },
-    { href: "/explore", label: "Explore Traveler" },
+    { href: "/explore", label: "Explore Travel" },
+    { href: "/traveller", label: "Traveller" },
     { href: "/pricing", label: "Pricing" },
 
  
@@ -92,7 +93,7 @@ const Header = async () => {
                             <Link className="" href="/login"> <Button >Login</Button> </Link>
                             <Link className="" href="/registration"> <Button >Registration</Button> </Link>
                         </div> : <div>
-                        <span className="text-white mr-4">Hello, <Link className="" href="/"> <Button > {user?.name}</Button> </Link> </span>
+                        <span className="text-white mr-4">Hello, <Link className="" href="/dashboard"> <Button > {user?.name}</Button> </Link> </span>
                              </div>  }
                        
                           

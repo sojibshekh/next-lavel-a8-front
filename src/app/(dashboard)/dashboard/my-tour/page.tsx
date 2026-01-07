@@ -1,30 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { Calendar, MapPin, ChevronDown, Star } from "lucide-react";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+interface Review {
+  id: string;
+  rating: number;
+  comment: string;
+  user: { name: string };
+}
 
 interface UserRequest {
   id: string;
-  fromUser: {
-    id: string;
-    name: string;
-    email: string;
-  };
+  fromUser: { id: string; name: string; email: string };
   status: "PENDING" | "APPROVED" | "REJECTED";
 }
 
@@ -33,183 +31,204 @@ interface TravelPlan {
   destination: string;
   startDate: string;
   endDate: string;
-  requests?: UserRequest[];
+  matches?: UserRequest[];
 }
 
 export default function TravelDashboard() {
-  const [myTravels, setMyTravels] = useState<TravelPlan[]>([]);
+  const [travels, setTravels] = useState<TravelPlan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [openRequests, setOpenRequests] = useState<string | null>(null);
+  const [reviews, setReviews] = useState<Record<string, Review[]>>({});
+  const [openReview, setOpenReview] = useState<string | null>(null);
 
-  const loadMyTravels = async () => {
-    setLoading(true);
+  useEffect(() => {
+    loadTravels();
+  }, []);
+
+  const loadTravels = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/travel-plans/my`, {
-        method: "GET",
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/travel-plans/my`,
+        { credentials: "include" }
+      );
       const data = await res.json();
-      setMyTravels(data.data || []);
-    } catch (err) {
-      console.error(err);
+      setTravels(data.data || []);
+    } catch {
       toast.error("Failed to load travel plans");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const loadReviews = async (id: string) => {
+    if (reviews[id]) return;
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/travel-plans/delete/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews/${id}`);
       const data = await res.json();
-      if (data.success) {
-        toast.success("Travel deleted successfully");
-        loadMyTravels();
-      } else {
-        toast.error(data.message || "Failed to delete travel");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Error deleting travel");
+      setReviews((p) => ({ ...p, [id]: data.data || [] }));
+    } catch {
+      toast.error("Failed to load reviews");
     }
   };
 
-  const handleUpdate = (id: string) => {
-    window.location.href = `/dashboard/my-tour/${id}`;
-  };
-
-  const handleApproveRequest = async (travelId: string, userId: string) => {
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/travel-plans/approve/${travelId}/${userId}`,
-        { method: "POST", credentials: "include" }
-      );
-      const data = await res.json();
-      if (data.success) {
-        toast.success("Request approved");
-        loadMyTravels();
-      } else {
-        toast.error(data.message || "Failed to approve request");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Error approving request");
-    }
-  };
-
-  useEffect(() => {
-    loadMyTravels();
-  }, []);
-
-  if (loading)
+  if (loading) {
     return (
-      <div className="max-w-6xl mx-auto mt-10 space-y-4">
-        <Skeleton className="h-10 w-40" />
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-10 w-full" />
+      <div className="max-w-7xl mx-auto py-10 grid md:grid-cols-2 gap-6">
+        {[1, 2].map((i) => (
+          <Skeleton key={i} className="h-56 w-full rounded-xl" />
+        ))}
       </div>
     );
+  }
 
   return (
-    <div className="max-w-6xl mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6">My Travel Plans</h1>
+    <div className="max-w-full py-10 space-y-8">
+      <div>
+        <h1 className="text-4xl font-bold tracking-tight">My Travel Plans</h1>
+        <p className="text-muted-foreground mt-1">
+          Manage your trips, join requests & reviews
+        </p>
+      </div>
 
-      {myTravels.length === 0 ? (
-        <p className="text-muted-foreground">You have no travel plans yet.</p>
-      ) : (
-        <table className="w-full border-collapse border border-gray-200">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2 text-left">Destination</th>
-              <th className="border px-4 py-2 text-left">Dates</th>
-              <th className="border px-4 py-2 text-left">Actions</th>
-              <th className="border px-4 py-2 text-left">Requests</th>
-            </tr>
-          </thead>
-          <tbody>
-            {myTravels.map((plan) => (
-              <tr key={plan.id} className="hover:bg-gray-50">
-                <td className="border px-4 py-2">{plan.destination}</td>
-                <td className="border px-4 py-2">
-                  {formatDate(plan.startDate)} → {formatDate(plan.endDate)}
-                </td>
-                <td className="border px-4 py-2 space-x-2">
-                  <Button size="sm" variant="outline" onClick={() => handleUpdate(plan.id)}>
-                    Update
-                  </Button>
-
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button size="sm" variant="destructive">
-                        Delete
-                      </Button>
-                    </AlertDialogTrigger>
-
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. This will permanently delete the travel plan.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleDelete(plan.id)}>
-                          Confirm Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </td>
-                <td className="border px-4 py-2">
-                  {(!plan.requests || plan.requests.length === 0) ? (
-                    <p className="text-muted-foreground">No requests</p>
-                  ) : (
-                    <table className="w-full border-collapse border border-gray-200">
-                      <thead>
-                        <tr className="bg-gray-50">
-                          <th className="border px-2 py-1 text-left">User</th>
-                          <th className="border px-2 py-1 text-left">Email</th>
-                          <th className="border px-2 py-1 text-left">Status</th>
-                          <th className="border px-2 py-1 text-left">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {plan.requests.map((req) => (
-                          <tr key={req.id}>
-                            <td className="border px-2 py-1">{req.fromUser.name}</td>
-                            <td className="border px-2 py-1">{req.fromUser.email}</td>
-                            <td className="border px-2 py-1">
-                              <Badge variant={getBadgeVariant(req.status)}>{req.status}</Badge>
-                            </td>
-                            <td className="border px-2 py-1">
-                              {req.status === "PENDING" && (
-                                <Button
-                                  size="sm"
-                                  variant="default"
-                                  onClick={() => handleApproveRequest(plan.id, req.fromUser.id)}
-                                >
-                                  Approve
-                                </Button>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {travels.length === 0 && (
+        <p className="text-muted-foreground">
+          You haven’t created any travel plans yet.
+        </p>
       )}
+
+      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {travels.map((plan) => (
+          <Card
+            key={plan.id}
+            className="rounded-2xl shadow-sm hover:shadow-md transition"
+          >
+            {/* Header */}
+            <CardHeader className="space-y-3">
+              <div className="flex justify-between items-start">
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <MapPin className="h-5 w-5 text-primary" />
+                  {plan.destination}
+                </CardTitle>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() =>
+                    (window.location.href = `/dashboard/my-tour/${plan.id}/edit`)
+                  }
+                >
+                  Edit
+                </Button>
+              </div>
+
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="h-4 w-4" />
+                {formatDate(plan.startDate)} – {formatDate(plan.endDate)}
+              </div>
+            </CardHeader>
+
+            <CardContent className="space-y-5">
+              {/* Join Requests */}
+              <div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="px-0 text-primary flex items-center gap-1"
+                  onClick={() =>
+                    setOpenRequests(openRequests === plan.id ? null : plan.id)
+                  }
+                >
+                  Join Requests ({plan.matches?.length || 0})
+                  <ChevronDown
+                    className={`ml-1 h-4 w-4 transition-transform ${
+                      openRequests === plan.id ? "rotate-180" : ""
+                    }`}
+                  />
+                </Button>
+
+                {openRequests === plan.id && (
+                  <div className="mt-2 space-y-2">
+                    {!plan.matches?.length ? (
+                      <p className="text-sm text-muted-foreground">
+                        No join requests
+                      </p>
+                    ) : (
+                      plan.matches.map((r) => (
+                        <div
+                          key={r.id}
+                          className="flex justify-between items-center bg-muted/50 rounded-lg px-3 py-2"
+                        >
+                          <div>
+                            <p className="text-sm font-medium">{r.fromUser.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {r.fromUser.email}
+                            </p>
+                          </div>
+                          <Badge variant={badgeVariant(r.status)}>{r.status}</Badge>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Reviews */}
+              <div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="px-0 text-primary flex items-center gap-1"
+                  onClick={() => {
+                    setOpenReview(openReview === plan.id ? null : plan.id);
+                    loadReviews(plan.id);
+                  }}
+                >
+                  View Reviews
+                  <ChevronDown
+                    className={`ml-1 h-4 w-4 transition-transform ${
+                      openReview === plan.id ? "rotate-180" : ""
+                    }`}
+                  />
+                </Button>
+
+                {openReview === plan.id && (
+                  <div className="mt-3 space-y-2">
+                    {!reviews[plan.id]?.length ? (
+                      <p className="text-sm text-muted-foreground">No reviews yet</p>
+                    ) : (
+                      reviews[plan.id].map((rev) => (
+                        <div key={rev.id} className="rounded-lg border p-3 text-sm">
+                          <div className="flex justify-between items-center">
+                            <p className="font-medium">{rev.user.name}</p>
+                            <div className="flex items-center gap-1 text-primary">
+                              <Star className="h-4 w-4 fill-primary" />
+                              {rev.rating}
+                            </div>
+                          </div>
+                          <p className="text-muted-foreground mt-1">{rev.comment}</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+
+                <Button
+                  size="sm"
+                  onClick={() =>
+                    (window.location.href = `/dashboard/my-tour/${plan.id}`)
+                  }
+                >
+                  View Details
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }
 
+/* helpers */
 const formatDate = (d: string) =>
   new Date(d).toLocaleDateString("en-US", {
     month: "short",
@@ -217,15 +236,8 @@ const formatDate = (d: string) =>
     year: "numeric",
   });
 
-const getBadgeVariant = (status: string) => {
-  switch (status) {
-    case "PENDING":
-      return "secondary";
-    case "APPROVED":
-      return "default";
-    case "REJECTED":
-      return "destructive";
-    default:
-      return "secondary";
-  }
+const badgeVariant = (status: string) => {
+  if (status === "APPROVED") return "default";
+  if (status === "REJECTED") return "destructive";
+  return "secondary";
 };

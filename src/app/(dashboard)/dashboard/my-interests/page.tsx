@@ -108,7 +108,7 @@ export default function MyMatchesPage() {
     );
 
   return (
-    <div className="max-w-4xl mx-auto py-10 space-y-6">
+    <div className="max-w-4xl  py-10 space-y-6">
       <h1 className="text-3xl font-bold mb-6">My Matches</h1>
 
       {/* Sent Requests */}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,8 +11,11 @@ import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react"
 import { handleLogin } from "./actions"
 import Link from "next/link"
 
+
 export default function LoginPage() {
     const router = useRouter()
+    const [loadingUser, setLoadingUser] = useState(true)
+
     const [formData, setFormData] = useState({
         email: "",
         password: ""
@@ -72,7 +75,42 @@ export default function LoginPage() {
         } finally {
             setIsLoading(false)
         }
+    } 
+
+    
+    useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/users/me`,
+          {
+            credentials: "include",
+          }
+        )
+
+        if (res.ok) {
+          router.replace("/dashboard") // 🔥 already logged in
+          return
+        }
+      } catch (err) {
+        console.log("Not logged in")
+      } finally {
+        setLoadingUser(false)
+      }
     }
+
+    checkUser()
+  }, [router])
+
+  // ⏳ while checking auth
+  if (loadingUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    )
+  }
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 px-4 py-12">
