@@ -30,6 +30,10 @@ const data = {
                     url: "/dashboard",
                 },
                 {
+                    title: "My Profile",
+                    url: "/dashboard/my-profile",
+                },
+                {
                     title: "Add Tour",
                     url: "/dashboard/add-tour",
                 },
@@ -72,6 +76,8 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
     //  const userInfo = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/me`)
     const userInfo = await getCurrentUserServer();
     const user = userInfo?.data;
+
+    console.log("Sidebar user:", user);
 
     return (
         <Sidebar {...props}>
