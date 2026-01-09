@@ -3,10 +3,6 @@ import { Button } from '../ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from '../ui/navigation-menu';
 import Link from 'next/link';
-import Image from 'next/image';
-
-
-import logoMain from '../../../public/vercel.svg';
 import { getCurrentUserServer } from '../Dashborad/AppSidebar';
 
 

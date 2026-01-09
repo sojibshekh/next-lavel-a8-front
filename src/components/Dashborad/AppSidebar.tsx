@@ -60,6 +60,7 @@ export async function getCurrentUserServer() {
         console.log("Fetching user with token:", token);
 
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
+            method: "GET",
             headers: {
                 Authorization: `${token}`
             },
