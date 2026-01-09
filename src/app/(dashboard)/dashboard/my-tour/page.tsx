@@ -13,6 +13,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { Calendar, MapPin, ChevronDown, Star } from "lucide-react";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
+
 interface Review {
   id: string;
   rating: number;
@@ -40,6 +50,9 @@ export default function TravelDashboard() {
   const [openRequests, setOpenRequests] = useState<string | null>(null);
   const [reviews, setReviews] = useState<Record<string, Review[]>>({});
   const [openReview, setOpenReview] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+const [deleting, setDeleting] = useState(false);
+
 
   useEffect(() => {
     loadTravels();
@@ -70,6 +83,35 @@ export default function TravelDashboard() {
       toast.error("Failed to load reviews");
     }
   };
+
+
+  const handleDelete = async () => {
+  if (!deleteId) return;
+
+  try {
+    setDeleting(true);
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/travel-plans/delete/${deleteId}`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      }
+    );
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Delete failed");
+
+    toast.success("Travel plan deleted");
+
+    setTravels((prev) => prev.filter((t) => t.id !== deleteId));
+    setDeleteId(null);
+  } catch (err: any) {
+    toast.error(err.message || "Delete failed");
+  } finally {
+    setDeleting(false);
+  }
+};
+
 
   if (loading) {
     return (
@@ -109,6 +151,7 @@ export default function TravelDashboard() {
                   <MapPin className="h-5 w-5 text-primary" />
                   {plan.destination}
                 </CardTitle>
+               <div className="flex gap-2">
                 <Button
                   size="sm"
                   variant="outline"
@@ -118,6 +161,16 @@ export default function TravelDashboard() {
                 >
                   Edit
                 </Button>
+
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => setDeleteId(plan.id)}
+                >
+                  Delete
+                </Button>
+              </div>
+
               </div>
 
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -224,6 +277,36 @@ export default function TravelDashboard() {
           </Card>
         ))}
       </div>
+
+      <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Are You Sure</DialogTitle>
+      <DialogDescription>
+      Delete Travel Plan? This action cannot be undone. Also Delete Match and Reviews associated with this plan.
+      </DialogDescription>
+    </DialogHeader>
+
+    <DialogFooter className="gap-2">
+      <Button
+        variant="outline"
+        onClick={() => setDeleteId(null)}
+        disabled={deleting}
+      >
+        Cancel
+      </Button>
+
+      <Button
+        variant="destructive"
+        onClick={handleDelete}
+        disabled={deleting}
+      >
+        {deleting ? "Deleting..." : "Confirm Delete"}
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
     </div>
   );
 }
