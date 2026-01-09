@@ -63,6 +63,7 @@ export async function getCurrentUserServer() {
             headers: {
                 Authorization: `${token}`
             },
+            credentials: "include",
             cache: 'no-store'
         })
 
