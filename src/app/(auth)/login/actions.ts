@@ -25,27 +25,27 @@ export async function handleLogin(email: string, password: string) {
 
         // Set cookies on server side
 
-        // const cookieStore = await cookies()
+        const cookieStore = await cookies()
 
-        // if ( data.data?.accessToken) {
-        //     console.log("Setting access token cookie:", data.data.accessToken);
-        //     cookieStore.set('accessToken', data.data.accessToken, {
-        //         httpOnly: true,
-        //         secure: true,
-        //         sameSite: 'none',
-        //         path: '/',
-        //     })
-        // }
+        if ( data.data?.accessToken) {
+            console.log("Setting access token cookie:", data.data.accessToken);
+            cookieStore.set('accessToken', data.data.accessToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                path: '/',
+            })
+        }
 
-        // if (data.data?.refreshToken) {
-        //     console.log("Setting refresh token cookie:", data.data.refreshToken);
-        //     cookieStore.set('refreshToken', data.data.refreshToken, {
-        //         httpOnly: true,
-        //         secure: true,        // MUST be true for SameSite=None
-        //         sameSite: "none",      // required for cross-site
-        //         path: '/',
-        //     })
-        // }
+        if (data.data?.refreshToken) {
+            console.log("Setting refresh token cookie:", data.data.refreshToken);
+            cookieStore.set('refreshToken', data.data.refreshToken, {
+                httpOnly: true,
+                secure: true,        // MUST be true for SameSite=None
+                sameSite: "none",      // required for cross-site
+                path: '/',
+            })
+        }
 
         return {
             success: true,
