@@ -94,7 +94,9 @@ export default function TravelPlansPageClient({
       try {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/matches/my`,
-          { credentials: "include" }
+          { credentials: "include",
+             headers: { "Content-Type": "application/json" },
+           }
         );
 
         if (!res.ok) return;
@@ -104,6 +106,7 @@ export default function TravelPlansPageClient({
         // ✅ REAL FIX — backend structure handle
         const sentRequests = data.data?.sentRequests || [];
         const ids = sentRequests.map(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (req: any) => req.travelPlanId
         );
 

@@ -17,8 +17,6 @@ const navigationLinks = [
     { href: "/explore", label: "Explore Travel" },
     { href: "/traveller", label: "Traveller" },
     { href: "/pricing", label: "Pricing" },
-
- 
     { href: "/contact", label: "Contact" },
 ];
 

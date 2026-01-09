@@ -72,6 +72,7 @@ export default function MyProfilePage({ userInfo }: MyProfileProps) {
         setPreviewImage(data.data.profilePhoto || "");
         toast.success("Profile updated successfully!");
         router.refresh();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         toast.error(err.message || "Update failed");
       }

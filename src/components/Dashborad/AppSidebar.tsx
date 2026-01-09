@@ -57,6 +57,8 @@ export async function getCurrentUserServer() {
         const cookieStore = await cookies()
         const token = cookieStore.get('accessToken')?.value
 
+        console.log("Fetching user with token:", token);
+
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
             headers: {
                 Authorization: `${token}`

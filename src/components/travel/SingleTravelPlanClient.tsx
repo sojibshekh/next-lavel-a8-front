@@ -25,7 +25,9 @@ export default function SingleTravelPlanClient({ currentUserId }: Props) {
   const params = useParams();
   const router = useRouter();
   console.log("Current User ID:", currentUserId);
+  
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [plan, setPlan] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [requestedPlans, setRequestedPlans] = useState<string[]>([]);
@@ -64,6 +66,7 @@ export default function SingleTravelPlanClient({ currentUserId }: Props) {
         const data = await res.json();
 
         const ids =
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           data?.data?.sentRequests?.map((r: any) => r.travelPlanId) || [];
         setRequestedPlans(ids);
       } catch (err) {
