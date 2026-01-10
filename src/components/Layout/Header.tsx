@@ -9,7 +9,7 @@ import { getCurrentUserServer } from '../Dashborad/AppSidebar';
 const navigationLinks = [
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
-    { href: "/destinations", label: "Destinations" },
+    
     { href: "/explore", label: "Explore Travel" },
     { href: "/traveller", label: "Traveller" },
     { href: "/pricing", label: "Pricing" },
